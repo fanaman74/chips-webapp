@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, Info } from "lucide-react";
+import { X, Send, Loader2, Info, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Call } from "@/lib/calls";
 
@@ -126,7 +126,7 @@ export function CallChatModal({ call, onClose }: { call: Call; onClose: () => vo
   return (
     <div className="fixed inset-0 z-60 flex flex-col bg-background">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 border-b border-border bg-card px-6 py-4 shadow-sm">
+      <div className="print:hidden flex items-start justify-between gap-4 border-b border-border bg-card px-6 py-4 shadow-sm">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-brand">
             <Info className="h-4 w-4 shrink-0" />
@@ -139,17 +139,34 @@ export function CallChatModal({ call, onClose }: { call: Call; onClose: () => vo
             {call.title}
           </h2>
         </div>
-        <button
-          onClick={onClose}
-          className="mt-0.5 rounded-lg p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-colors"
-          aria-label="Close"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => window.print()}
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-colors"
+            aria-label="Print / Save as PDF"
+            title="Print / Save as PDF"
+          >
+            <Printer className="h-5 w-5" />
+          </button>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 md:px-8">
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 md:px-8 print:overflow-visible">
+        {/* Print-only header */}
+        <div className="hidden print:block mb-6">
+          <p className="font-mono text-xs text-gray-500">{call.id}</p>
+          <h1 className="text-lg font-bold leading-snug">{call.title}</h1>
+          <p className="text-xs text-gray-400 mt-1">AI Agent Review — CHIPS JU Call Information</p>
+          <hr className="mt-3" />
+        </div>
         <div className="mx-auto max-w-3xl space-y-4">
           {messages.map((m, i) => (
             <div
@@ -180,7 +197,7 @@ export function CallChatModal({ call, onClose }: { call: Call; onClose: () => vo
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-card px-4 py-3 md:px-8">
+      <div className="print:hidden border-t border-border bg-card px-4 py-3 md:px-8">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <textarea
             ref={inputRef}
