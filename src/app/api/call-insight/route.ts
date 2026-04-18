@@ -17,7 +17,6 @@ export type CallInsight = {
   evaluationImplementation: string;
   positioningAdvice: string[];
   nextSteps: string[];
-  disclaimer: string;
 };
 
 async function ensureBucket() {
@@ -139,8 +138,7 @@ Return ONLY a JSON object — no markdown, no explanation:
   "evaluationImpact": "What evaluators look for under Impact: EU priority alignment, market/societal value, measurable KPIs",
   "evaluationImplementation": "What evaluators look for under Implementation: consortium strength, feasibility, milestone credibility",
   "positioningAdvice": ["Specific tip 1 to frame a winning proposal", "Tip 2 — common mistake to avoid", "Tip 3 — strategic angle"],
-  "nextSteps": ["First concrete action the applicant should take", "Second action", "Where to validate or find more info"],
-  "disclaimer": "One sentence: whether this analysis is based on the official Work Programme document or AI training knowledge, and that applicants should verify on the EU Funding & Tenders Portal."
+  "nextSteps": ["First concrete action the applicant should take", "Second action", "Where to validate or find more info"]
 }`;
 
   try {

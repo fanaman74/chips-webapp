@@ -273,6 +273,18 @@ function InsightPanel({ insight }: { insight: CallInsight }) {
         </Section>
       )}
 
+      <p className="rounded-lg border border-border bg-surface-1 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+        ⚠ AI-generated analysis. Always verify requirements, budget, and deadlines on the official{" "}
+        <a
+          href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-search"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-foreground"
+        >
+          EU Funding &amp; Tenders Portal
+        </a>
+        .
+      </p>
     </div>
   );
 }
