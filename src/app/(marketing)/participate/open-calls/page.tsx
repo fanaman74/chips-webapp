@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Calendar } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Clock } from "lucide-react";
 import { getCalls } from "@/lib/calls";
 import { PageHero } from "@/components/marketing/page-hero";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, relativeDeadline } from "@/lib/format";
+import { formatDate, daysUntil, relativeDeadline } from "@/lib/format";
 import { INSTRUMENT_COLOR, colorFor } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 
@@ -13,14 +13,17 @@ export const revalidate = 3600;
 
 export default async function ChipsOpenCallsPage() {
   const all = await getCalls();
-  const calls = all.filter((c) => c.status === "open");
+  // Only truly open: status=open AND deadline is future (or unknown)
+  const calls = all.filter(
+    (c) => c.status === "open" && (!c.deadline || daysUntil(c.deadline) >= 0)
+  );
 
   return (
     <>
       <PageHero
         eyebrow="Step 01 — Find a matching call"
-        title="CHIPS open calls for proposals."
-        description="All currently open funding opportunities under the Chips Joint Undertaking, sourced live from the EU Funding & Tenders Portal."
+        title="Open calls for proposals."
+        description={`${calls.length} funding ${calls.length === 1 ? "opportunity" : "opportunities"} currently open under the Chips Joint Undertaking — sourced live from the EU Funding & Tenders Portal.`}
       >
         <Link
           href="/participate"
@@ -34,129 +37,158 @@ export default async function ChipsOpenCallsPage() {
       <Section>
         <Container>
           {calls.length === 0 ? (
-            <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
-              No open calls at this time. Check the{" "}
+            <div className="rounded-2xl border border-border bg-card p-16 text-center">
+              <p className="text-muted-foreground">No open calls at this time.</p>
               <a
                 href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-search"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-foreground"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:underline"
               >
-                EU Funding & Tenders Portal
-              </a>{" "}
-              for updates.
+                Browse the EU Funding & Tenders Portal
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-card">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-surface-1">
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Call ID
-                    </th>
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Title
-                    </th>
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Programme
-                    </th>
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Type
-                    </th>
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Deadline
-                    </th>
-                    <th className="px-5 py-3.5 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      Opened
-                    </th>
-                    <th className="sr-only">Apply</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calls.map((c, i) => {
-                    const instrColor = colorFor(
-                      INSTRUMENT_COLOR[c.instrument as keyof typeof INSTRUMENT_COLOR] ?? "brand"
-                    );
-                    return (
-                      <tr
-                        key={c.id}
-                        className={cn(
-                          "group transition-colors hover:bg-surface-2",
-                          i > 0 && "border-t border-border"
-                        )}
-                      >
-                        <td className="whitespace-nowrap px-5 py-4 font-mono text-[11px] text-muted-foreground">
-                          {c.id}
-                        </td>
-                        <td className="px-5 py-4 max-w-sm">
-                          <span className="font-display text-sm font-semibold leading-snug tracking-tight line-clamp-2">
-                            {c.title}
-                          </span>
-                          {c.summary && (
-                            <p className="mt-1 text-xs text-muted-foreground line-clamp-2 max-w-xs">
-                              {c.summary}
-                            </p>
+            <div className="grid gap-5 md:grid-cols-2">
+              {calls.map((c) => {
+                const instrColor = colorFor(
+                  INSTRUMENT_COLOR[c.instrument as keyof typeof INSTRUMENT_COLOR] ?? "brand"
+                );
+                const days = c.deadline ? daysUntil(c.deadline) : null;
+                const urgency =
+                  days !== null && days <= 14
+                    ? "urgent"
+                    : days !== null && days <= 30
+                    ? "soon"
+                    : "normal";
+
+                return (
+                  <div
+                    key={c.id}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-elevated"
+                  >
+                    {/* coloured top strip */}
+                    <span
+                      aria-hidden
+                      className={cn("absolute inset-x-0 top-0 h-1", instrColor.dot)}
+                    />
+
+                    {/* subtle gradient wash */}
+                    <div
+                      aria-hidden
+                      className={cn(
+                        "pointer-events-none absolute -top-20 -right-20 h-52 w-52 rounded-full bg-gradient-to-br opacity-30 blur-3xl",
+                        instrColor.gradient
+                      )}
+                    />
+
+                    <div className="relative flex flex-1 flex-col gap-4 p-6 pt-7">
+                      {/* badges row */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="brand">{c.programme}</Badge>
+                        <span
+                          className={cn(
+                            "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                            instrColor.chip
                           )}
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <Badge variant="brand">{c.programme}</Badge>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
+                        >
+                          {c.instrument}
+                        </span>
+                        {days !== null && urgency !== "normal" && (
                           <span
                             className={cn(
-                              "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
-                              instrColor.chip
+                              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+                              urgency === "urgent"
+                                ? "bg-rose/15 text-rose"
+                                : "bg-amber/15 text-amber"
                             )}
                           >
-                            {c.instrument}
+                            <Clock className="h-3 w-3" />
+                            {relativeDeadline(c.deadline!)}
                           </span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          {c.deadline ? (
-                            <div>
-                              <div className="font-display text-sm font-semibold">
-                                {formatDate(c.deadline)}
-                              </div>
-                              <div className="text-[10px] text-amber">
+                        )}
+                      </div>
+
+                      {/* call id */}
+                      <span className={cn("font-mono text-xs font-semibold", instrColor.text)}>
+                        {c.id}
+                      </span>
+
+                      {/* title */}
+                      <h3 className="font-display text-lg font-semibold leading-snug tracking-tight">
+                        {c.title}
+                      </h3>
+
+                      {/* summary */}
+                      {c.summary && (
+                        <p className="flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                          {c.summary}
+                        </p>
+                      )}
+
+                      {/* dates row */}
+                      <div className="mt-auto grid grid-cols-2 gap-3 border-t border-border pt-4 text-xs">
+                        {c.open_date && (
+                          <div>
+                            <div className="font-mono text-[10px] uppercase text-muted-foreground">
+                              Opened
+                            </div>
+                            <div className="mt-0.5 font-display text-sm font-semibold">
+                              {formatDate(c.open_date)}
+                            </div>
+                          </div>
+                        )}
+                        {c.deadline ? (
+                          <div>
+                            <div className="font-mono text-[10px] uppercase text-muted-foreground">
+                              Deadline
+                            </div>
+                            <div className="mt-0.5 font-display text-sm font-semibold">
+                              {formatDate(c.deadline)}
+                            </div>
+                            {urgency === "normal" && (
+                              <div className={cn("text-[10px]", instrColor.text)}>
                                 {relativeDeadline(c.deadline)}
                               </div>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-muted-foreground">
-                          {formatDate(c.open_date)}
-                        </td>
-                        <td className="px-5 py-4">
-                          <a
-                            href={c.portal_url ?? "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-brand hover:bg-brand hover:text-white"
-                          >
-                            Apply
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <div className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
-                {calls.length} open {calls.length === 1 ? "call" : "calls"} · Data sourced from the{" "}
-                <a
-                  href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-search"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
-                >
-                  EU Funding & Tenders Portal
-                </a>
-              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div />
+                        )}
+                      </div>
+
+                      {/* CTA */}
+                      <a
+                        href={c.portal_url ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium transition-colors",
+                          "border-border text-foreground/70 hover:border-brand hover:bg-brand hover:text-white"
+                        )}
+                      >
+                        Apply on EU Portal
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
+
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Data sourced from the{" "}
+            <a
+              href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-search"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              EU Funding & Tenders Portal
+            </a>
+          </p>
         </Container>
       </Section>
     </>
