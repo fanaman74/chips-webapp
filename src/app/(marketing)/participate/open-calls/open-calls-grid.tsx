@@ -131,12 +131,12 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
 
             {/* Footer CTA */}
             <div className="border-t border-border p-4 flex items-center gap-2">
-              {/* Download Work Programme PDF */}
+              {/* Download call documents */}
               <a
-                href="https://www.chips-ju.europa.eu/GB_2025.125_Appendix8_2026_CEIv1.pdf"
+                href={`https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/${selected.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Download Work Programme PDF"
+                title="Call documents on EU F&T Portal"
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-1 text-muted-foreground transition hover:border-brand hover:text-brand"
               >
                 <Download className="h-4 w-4" />
