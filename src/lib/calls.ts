@@ -28,7 +28,7 @@ export async function getOpenCalls(): Promise<Call[]> {
     .from("calls")
     .select("*")
     .eq("status", "open")
-    .order("deadline", { ascending: true, nullsFirst: false });
+    .order("open_date", { ascending: false, nullsFirst: false });
 
   if (error || !data) return [];
   return data as Call[];

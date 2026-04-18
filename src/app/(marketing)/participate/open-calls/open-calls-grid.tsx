@@ -312,7 +312,7 @@ function Section({
 function CallCard({ call: c, onClick }: { call: Call; onClick: () => void }) {
   const instrColor = colorFor(INSTRUMENT_COLOR[c.instrument as keyof typeof INSTRUMENT_COLOR] ?? "brand");
   const days = c.deadline ? daysUntil(c.deadline) : null;
-  const urgency = days !== null && days <= 14 ? "urgent" : days !== null && days <= 30 ? "soon" : "normal";
+  const urgency = days !== null && days >= 0 && days <= 14 ? "urgent" : days !== null && days >= 0 && days <= 30 ? "soon" : "normal";
 
   return (
     <button
