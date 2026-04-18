@@ -7,6 +7,25 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { PartnerResult } from "@/app/api/partner-match/route";
 
+const EXAMPLES = [
+  {
+    label: "AI chip for automotive",
+    text: "We are developing a novel AI accelerator chip using FDSOI technology for edge inference applications in automotive. We need partners with experience in low-power circuit design, advanced semiconductor packaging, functional safety (ISO 26262), and system-level integration for next-generation automotive intelligence platforms.",
+  },
+  {
+    label: "Chiplet packaging",
+    text: "Our project focuses on advanced chiplet-based heterogeneous integration using 2.5D and 3D packaging technologies. We are looking for partners with expertise in die-to-die interconnects, thermal management, EDA tools for chiplet design, and pilot line access for packaging process development.",
+  },
+  {
+    label: "Quantum computing chips",
+    text: "We are building a cryogenic control chip for quantum computing applications, targeting qubit control at millikelvin temperatures. We seek partners specialising in cryo-CMOS design, superconducting qubit fabrication, low-noise RF electronics, and system integration for near-term quantum processors.",
+  },
+  {
+    label: "Green power electronics",
+    text: "Our initiative develops wide-bandgap semiconductor devices (GaN and SiC) for high-efficiency power conversion in EV drivetrains and industrial motor control. We need partners with process expertise in GaN-on-Si or SiC epitaxy, device characterisation, reliability testing, and power module packaging.",
+  },
+];
+
 const EU_COUNTRIES = [
   "Austria","Belgium","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark",
   "Estonia","Finland","France","Germany","Greece","Hungary","Ireland","Italy",
@@ -179,6 +198,23 @@ export function ConsortiumForm() {
               />
               <div className="mt-1 text-right text-xs text-muted-foreground">
                 {description.length} chars
+              </div>
+
+              {/* Example use cases */}
+              <div className="mt-3">
+                <p className="mb-2 text-xs text-muted-foreground">Try an example:</p>
+                <div className="flex flex-wrap gap-2">
+                  {EXAMPLES.map((ex) => (
+                    <button
+                      key={ex.label}
+                      type="button"
+                      onClick={() => setDescription(ex.text)}
+                      className="rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium text-muted-foreground transition hover:border-brand hover:bg-brand/10 hover:text-brand"
+                    >
+                      {ex.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
