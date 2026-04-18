@@ -273,12 +273,6 @@ function InsightPanel({ insight }: { insight: CallInsight }) {
         </Section>
       )}
 
-      {/* Disclaimer */}
-      {insight.disclaimer && (
-        <p className="rounded-lg border border-border bg-surface-1 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-          ⚠ {insight.disclaimer}
-        </p>
-      )}
     </div>
   );
 }
