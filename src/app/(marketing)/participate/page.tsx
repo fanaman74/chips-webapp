@@ -103,18 +103,18 @@ export default function ParticipatePage() {
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((s) => {
-              const isFirst = s.step === "01";
+              const linked = s.step === "01" || s.step === "02";
+              const href = s.step === "01" ? "/participate/open-calls" : "/participate/consortium";
               const card = (
                 <div
-                  key={s.step}
                   className={cn(
                     "rounded-xl border border-border bg-card p-6 shadow-card",
-                    isFirst && "group transition-all hover:border-brand hover:shadow-elevated cursor-pointer"
+                    linked && "group transition-all hover:border-brand hover:shadow-elevated cursor-pointer"
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="font-mono text-sm font-semibold text-accent-600">{s.step}</div>
-                    {isFirst && (
+                    {linked && (
                       <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:text-brand group-hover:translate-x-0.5" />
                     )}
                   </div>
@@ -124,8 +124,8 @@ export default function ParticipatePage() {
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
                 </div>
               );
-              return isFirst ? (
-                <Link key={s.step} href="/participate/open-calls">{card}</Link>
+              return linked ? (
+                <Link key={s.step} href={href}>{card}</Link>
               ) : (
                 <div key={s.step}>{card}</div>
               );

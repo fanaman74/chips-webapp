@@ -73,7 +73,7 @@ function parseCordisDate(raw?: string): string {
   const m = raw.match(/(\d+)\s*\{\{month_(\d+)\}\}\s*(\d{4})/);
   if (!m) return "";
   const day = m[1].padStart(2, "0");
-  const month = MONTH_MAP[m[2]];
+  const month = MONTH_MAP[String(parseInt(m[2], 10))];
   if (!month) return "";
   const year = m[3];
   return `${year}-${month}-${day}`;
