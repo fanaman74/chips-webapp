@@ -14,12 +14,17 @@ export const revalidate = 3600;
 export default async function CallsPage() {
   const calls = await getCalls();
 
-  const groups = {
-    open: calls.filter((c) => c.status === "open"),
-    forthcoming: calls.filter((c) => c.status === "forthcoming"),
-    closed: calls.filter((c) => c.status === "closed"),
-  };
+  const open = calls.filter((c) => c.status === "open");
+  const rest = calls
+    .filter((c) => c.status !== "open")
+    .sort((a, b) => {
+      const da = a.deadline ?? a.open_date ?? "";
+      const db = b.deadline ?? b.open_date ?? "";
+      return da < db ? -1 : da > db ? 1 : 0;
+    });
 
+  const forthcoming = calls.filter((c) => c.status === "forthcoming");
+  const closed = calls.filter((c) => c.status === "closed");
   const total = calls.length;
 
   return (
@@ -32,15 +37,15 @@ export default async function CallsPage() {
         <div className="flex flex-wrap gap-3">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1.5 text-sm">
             <span className="h-2 w-2 rounded-full bg-success" />
-            {groups.open.length} open
+            {open.length} open
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1.5 text-sm">
             <span className="h-2 w-2 rounded-full bg-amber" />
-            {groups.forthcoming.length} forthcoming
+            {forthcoming.length} forthcoming
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1.5 text-sm text-muted-foreground">
             <span className="h-2 w-2 rounded-full bg-border" />
-            {groups.closed.length} closed
+            {closed.length} closed
           </div>
         </div>
       </PageHero>
@@ -53,9 +58,8 @@ export default async function CallsPage() {
             </div>
           ) : (
             <>
-              <CallGroup title="Open for submission" accent="success" calls={groups.open} />
-              <CallGroup title="Opening soon" accent="amber" calls={groups.forthcoming} />
-              <CallGroup title="Recently closed" accent="muted" calls={groups.closed} />
+              <CallGroup title="Open for submission" accent="success" calls={open} />
+              {rest.length > 0 && <CallGroup title="All other calls" accent="muted" calls={rest} />}
             </>
           )}
         </Container>
