@@ -24,17 +24,22 @@ export function formatNumber(value: number, opts: { compact?: boolean } = {}) {
   return new Intl.NumberFormat("en-EU").format(value);
 }
 
-export function formatDate(iso: string, opts: Intl.DateTimeFormatOptions = {}) {
+export function formatDate(iso: string | null | undefined, opts: Intl.DateTimeFormatOptions = {}) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
     ...opts,
-  }).format(new Date(iso));
+  }).format(d);
 }
 
-export function formatDateRange(startIso: string, endIso: string) {
-  return `${formatDate(startIso, { month: "short", year: "numeric" })} – ${formatDate(endIso, { month: "short", year: "numeric" })}`;
+export function formatDateRange(startIso: string | null | undefined, endIso: string | null | undefined) {
+  const s = formatDate(startIso, { month: "short", year: "numeric" });
+  const e = formatDate(endIso, { month: "short", year: "numeric" });
+  return e === "—" ? s : `${s} – ${e}`;
 }
 
 export function daysUntil(iso: string) {
