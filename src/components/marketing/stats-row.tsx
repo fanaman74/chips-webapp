@@ -1,4 +1,4 @@
-import type { HeroStat } from "@/data/stats";
+import type { HeroStat } from "@/lib/cordis";
 import { Counter } from "./counter";
 import { colorFor, type ColorKey } from "@/lib/colors";
 import { cn } from "@/lib/utils";
