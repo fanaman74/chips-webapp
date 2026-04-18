@@ -73,7 +73,8 @@ function parseCordisDate(raw?: string): string {
   const m = raw.match(/(\d+)\s*\{\{month_(\d+)\}\}\s*(\d{4})/);
   if (!m) return "";
   const day = m[1].padStart(2, "0");
-  const month = MONTH_MAP[m[2]] ?? m[2].padStart(2, "0");
+  const month = MONTH_MAP[m[2]];
+  if (!month) return "";
   const year = m[3];
   return `${year}-${month}-${day}`;
 }
@@ -98,23 +99,13 @@ function deriveStatus(startDate: string, endDate: string): Project["status"] {
  */
 function mapProgramme(raw?: { code: string; id: string; title: string }[]): Project["programme"] {
   if (!raw) return "CHIPS";
-  const hasKDT = raw.some(
-    (p) =>
-      p.id?.toUpperCase().includes("KDT") ||
-      p.title?.toLowerCase().includes("key digital technologies")
-  );
-  const hasCHIPS = raw.some(
-    (p) =>
-      p.id?.toUpperCase().includes("CHIPS") ||
-      p.title?.toLowerCase().includes("chips")
-  );
-  // Prefer CHIPS; if only KDT signals found, use KDT
-  if (hasCHIPS) return "CHIPS";
-  if (hasKDT) return "KDT";
+  if (raw.some(p => p.id?.toUpperCase().includes("CHIPS"))) return "CHIPS";
+  if (raw.some(p => p.id?.toUpperCase().includes("KDT"))) return "KDT";
+  if (raw.some(p => p.title?.toLowerCase().includes("key digital technologies"))) return "KDT";
   return "CHIPS";
 }
 
-function mapProject(r: CordisRaw, programmeFallback?: Project["programme"]): Project {
+function mapProject(r: CordisRaw): Project {
   const startDate = parseCordisDate(r.startDate);
   const endDate = parseCordisDate(r.endDate);
 
@@ -138,7 +129,7 @@ function mapProject(r: CordisRaw, programmeFallback?: Project["programme"]): Pro
     consortium: [],                     // Not available in search API
     summary: r.teaser ?? "",
     description: r.teaser ?? "",
-    programme: mapProgramme(r.programme) ?? programmeFallback ?? "CHIPS",
+    programme: mapProgramme(r.programme),
   };
 }
 
@@ -166,7 +157,8 @@ export async function getCordisProjects(): Promise<Project[]> {
 }
 
 export async function getCordisProject(rcn: string): Promise<Project | null> {
-  // Fetch individual project by rcn for detail pages
+  if (_cache) return _cache.find((p) => p.rcn === rcn) ?? null;
+  if (!/^\d+$/.test(rcn)) return null;
   const singleQuery = `contenttype%3Dproject%20AND%20rcn%3D${rcn}`;
   const raw = await fetchCordis(singleQuery, 1);
   if (!raw[0]) return null;
