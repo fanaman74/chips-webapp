@@ -11,14 +11,12 @@ import { INSTRUMENT_COLOR, colorFor } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 import type { Call } from "@/lib/calls";
 import type { CallInsight } from "@/app/api/call-insight/route";
-import { CallChatModal } from "./call-chat-modal";
 
 export function OpenCallsGrid({ calls }: { calls: Call[] }) {
   const [selected, setSelected] = useState<Call | null>(null);
   const [insight, setInsight] = useState<CallInsight | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [chatCall, setChatCall] = useState<Call | null>(null);
 
   async function openCall(c: Call) {
     setSelected(c);
@@ -57,10 +55,6 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
 
   return (
     <>
-      {chatCall && (
-        <CallChatModal call={chatCall} onClose={() => setChatCall(null)} />
-      )}
-
       {/* Card grid */}
       <div className="grid gap-5 md:grid-cols-2">
         {calls.map((c) => <CallCard key={c.id} call={c} onClick={() => openCall(c)} />)}
@@ -148,14 +142,16 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
                 <Download className="h-4 w-4" />
               </a>
 
-              {/* More info — opens AI chat agent */}
-              <button
-                onClick={() => setChatCall(selected)}
+              {/* More info on CHIPS JU */}
+              <a
+                href="https://www.chips-ju.europa.eu/calls/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-surface-1 text-sm font-medium text-muted-foreground transition hover:border-brand hover:text-brand"
               >
                 <Info className="h-4 w-4" />
                 More info
-              </button>
+              </a>
 
               {/* Apply */}
               <a
