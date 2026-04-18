@@ -24,12 +24,10 @@ export async function getCalls(): Promise<Call[]> {
 }
 
 export async function getOpenCalls(): Promise<Call[]> {
-  const today = new Date().toISOString().slice(0, 10);
   const { data, error } = await supabase
     .from("calls")
     .select("*")
     .eq("status", "open")
-    .or(`deadline.is.null,deadline.gte.${today}`)
     .order("deadline", { ascending: true, nullsFirst: false });
 
   if (error || !data) return [];

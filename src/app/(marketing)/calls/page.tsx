@@ -14,15 +14,9 @@ export const revalidate = 3600;
 export default async function CallsPage() {
   const calls = await getCalls();
 
-  const today = new Date().toISOString().slice(0, 10);
-  const open = calls.filter(
-    (c) => c.status === "open" && (!c.deadline || c.deadline >= today)
-  );
-  // Calls marked "open" but with passed deadlines join the rest
+  const open = calls.filter((c) => c.status === "open");
   const rest = calls
-    .filter(
-      (c) => c.status !== "open" || (c.deadline && c.deadline < today)
-    )
+    .filter((c) => c.status !== "open")
     .sort((a, b) => {
       const da = a.deadline ?? a.open_date ?? "";
       const db = b.deadline ?? b.open_date ?? "";
@@ -30,9 +24,7 @@ export default async function CallsPage() {
     });
 
   const forthcoming = calls.filter((c) => c.status === "forthcoming");
-  const closed = calls.filter(
-    (c) => c.status === "closed" || (c.status === "open" && c.deadline && c.deadline < today)
-  );
+  const closed = calls.filter((c) => c.status === "closed");
   const total = calls.length;
 
   return (

@@ -3,7 +3,6 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getCalls } from "@/lib/calls";
 import { PageHero } from "@/components/marketing/page-hero";
 import { Container, Section } from "@/components/ui/container";
-import { daysUntil } from "@/lib/format";
 import { OpenCallsGrid } from "./open-calls-grid";
 
 export const metadata = { title: "CHIPS open calls" };
@@ -11,9 +10,7 @@ export const revalidate = 3600;
 
 export default async function ChipsOpenCallsPage() {
   const all = await getCalls();
-  const calls = all.filter(
-    (c) => c.status === "open" && (!c.deadline || daysUntil(c.deadline) >= 0)
-  );
+  const calls = all.filter((c) => c.status === "open");
 
   return (
     <>
