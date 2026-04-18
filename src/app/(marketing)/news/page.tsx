@@ -6,10 +6,13 @@ import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
 
-export const metadata = { title: "News & Events" };
+export const metadata = { title: "News" };
 
 export default function NewsIndex() {
-  const [lead, ...rest] = [...NEWS].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const articles = [...NEWS]
+    .filter((n) => n.category !== "Event")
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const [lead, ...rest] = articles;
 
   return (
     <>

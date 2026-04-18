@@ -22,17 +22,17 @@ export function PageHero({ eyebrow, title, description, children, className }: P
         aria-hidden
         className="absolute inset-0 bg-grid bg-grid-fade opacity-30 dark:opacity-20"
       />
-      <Container className="relative">
-        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+      <Container className="relative text-center">
+        {eyebrow && <Eyebrow className="justify-center">{eyebrow}</Eyebrow>}
         <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.05] tracking-tight text-balance md:text-5xl lg:text-6xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-5 max-w-3xl text-balance text-muted-foreground md:text-lg">
+          <p className="mt-5 mx-auto max-w-3xl text-balance text-muted-foreground md:text-lg">
             {description}
           </p>
         )}
-        {children && <div className="mt-8">{children}</div>}
+        {children && <div className="mt-8 flex justify-center">{children}</div>}
       </Container>
     </section>
   );
