@@ -61,6 +61,24 @@ export function CallMatchClient({ calls }: { calls: Call[] }) {
   const preselected = searchParams.get("call") ?? "";
 
   const [callId, setCallId] = useState(preselected || (calls[0]?.id ?? ""));
+
+  const EXAMPLES = [
+    {
+      label: "Chiplet Integration",
+      project: "We are developing a heterogeneous integration platform for chiplet-based SoCs targeting advanced semiconductor packaging at TRL 4–6. The technology combines 2.5D/3D die stacking with silicon photonics interconnects to achieve 10× better power efficiency for AI inference accelerators. Our innovation directly addresses Europe's dependency on non-EU packaging infrastructure and positions European fabs at the forefront of next-generation chip assembly. Target markets: data centres, automotive AI, and edge computing.",
+      consortium: "Lead: European semiconductor foundry (Germany). Partners: University research institute (Netherlands), photonics SME (France), automotive Tier-1 supplier (Italy). 4 countries, 4 partners.",
+    },
+    {
+      label: "AI-Assisted EDA",
+      project: "Our project builds an AI-assisted EDA toolchain for automated IC layout verification and physical design optimisation, targeting TRL 5–7. Using transformer-based ML models trained on tape-out datasets, our tool reduces design rule checking cycles by 40% and cuts tape-out costs for European fabless companies. The platform targets 3nm and below process nodes. We address the critical gap in European EDA sovereignty and reduce reliance on US-dominated tooling.",
+      consortium: "Lead: EDA software company (UK). Partners: Semiconductor IP provider (Sweden), fabless design house (Belgium), two universities (Spain, Austria). 5 partners, 5 countries.",
+    },
+    {
+      label: "GaN Power Electronics",
+      project: "We are establishing a pilot line for GaN-on-Si wide-bandgap power semiconductor manufacturing at TRL 6–8. Our process targets 650V devices for automotive inverters and industrial motor drives, with a roadmap to 1200V for grid-edge energy storage. The pilot line will produce wafers at 200mm scale, enabling European volume production of power chips currently sourced from Asia. The project directly supports EU Green Deal objectives by enabling high-efficiency electrification.",
+      consortium: "Lead: Power semiconductor manufacturer (Germany). Partners: Tier-1 automotive supplier (France), national research lab (Portugal), equipment supplier (Denmark). 4 partners.",
+    },
+  ];
   const [projectDescription, setProjectDescription] = useState("");
   const [consortiumDescription, setConsortiumDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -133,9 +151,23 @@ export function CallMatchClient({ calls }: { calls: Call[] }) {
 
           {/* Project description */}
           <div>
-            <label className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Your Project Idea <span className="text-rose">*</span>
-            </label>
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <label className="font-mono text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Your Project Idea <span className="text-rose">*</span>
+              </label>
+              <div className="flex gap-1.5">
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex.label}
+                    type="button"
+                    onClick={() => { setProjectDescription(ex.project); setConsortiumDescription(ex.consortium); }}
+                    className="rounded-lg border border-border bg-surface-1 px-2 py-1 text-[10px] font-medium text-muted-foreground transition hover:border-brand hover:text-brand"
+                  >
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
@@ -170,10 +202,10 @@ export function CallMatchClient({ calls }: { calls: Call[] }) {
           </button>
         </div>
 
-        <p className="text-center text-[10px] leading-relaxed text-muted-foreground px-2">
-          AI-generated evaluation. Always verify eligibility and requirements on the official{" "}
-          <a href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/home" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
-            EU Funding &amp; Tenders Portal
+        <p className="text-center text-[10px] text-muted-foreground">
+          AI-generated. Verify on the{" "}
+          <a href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/home" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground whitespace-nowrap">
+            EU F&amp;T Portal
           </a>.
         </p>
       </div>
