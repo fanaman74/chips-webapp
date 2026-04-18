@@ -3,6 +3,7 @@ import { ArrowRight, Building2, Flame, GraduationCap, HelpCircle, Rocket } from 
 import { PageHero } from "@/components/marketing/page-hero";
 import { Container, Section } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Participate" };
 
@@ -101,15 +102,34 @@ export default function ParticipatePage() {
             Applying in four steps.
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((s) => (
-              <div key={s.step} className="rounded-xl border border-border bg-card p-6 shadow-card">
-                <div className="font-mono text-sm font-semibold text-accent-600">{s.step}</div>
-                <h3 className="mt-2 font-display text-lg font-semibold tracking-tight">
-                  {s.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-              </div>
-            ))}
+            {STEPS.map((s) => {
+              const isFirst = s.step === "01";
+              const card = (
+                <div
+                  key={s.step}
+                  className={cn(
+                    "rounded-xl border border-border bg-card p-6 shadow-card",
+                    isFirst && "group transition-all hover:border-brand hover:shadow-elevated cursor-pointer"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-mono text-sm font-semibold text-accent-600">{s.step}</div>
+                    {isFirst && (
+                      <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:text-brand group-hover:translate-x-0.5" />
+                    )}
+                  </div>
+                  <h3 className="mt-2 font-display text-lg font-semibold tracking-tight">
+                    {s.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                </div>
+              );
+              return isFirst ? (
+                <Link key={s.step} href="/participate/open-calls">{card}</Link>
+              ) : (
+                <div key={s.step}>{card}</div>
+              );
+            })}
           </div>
         </Container>
       </section>
