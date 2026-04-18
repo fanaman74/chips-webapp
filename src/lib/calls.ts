@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase, supabaseAdmin } from "./supabase";
 
 export type Call = {
   id: string;
@@ -125,7 +125,7 @@ export async function syncCallsFromEU(): Promise<{ inserted: number; updated: nu
 
   if (!rows.length) return { inserted: 0, updated: 0 };
 
-  const { error } = await supabase.from("calls").upsert(
+  const { error } = await supabaseAdmin.from("calls").upsert(
     rows.map((r) => ({ ...r, synced_at: new Date().toISOString() })),
     { onConflict: "id" }
   );
