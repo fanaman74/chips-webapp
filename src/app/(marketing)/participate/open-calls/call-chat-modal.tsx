@@ -180,8 +180,8 @@ export function CallChatModal({ call, onClose }: { call: Call; onClose: () => vo
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-card px-4 py-4 md:px-8">
-        <div className="mx-auto flex max-w-3xl items-end gap-3">
+      <div className="border-t border-border bg-card px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-3xl items-center gap-3">
           <textarea
             ref={inputRef}
             value={input}
@@ -205,19 +205,19 @@ export function CallChatModal({ call, onClose }: { call: Call; onClose: () => vo
               <Send className="h-4 w-4" />
             )}
           </button>
+          <p className="hidden md:block shrink-0 text-[10px] text-muted-foreground max-w-[140px] leading-tight">
+            AI-generated. Verify on the{" "}
+            <a
+              href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              EU F&amp;T Portal
+            </a>
+            .
+          </p>
         </div>
-        <p className="mx-auto mt-2 max-w-3xl text-center text-[10px] text-muted-foreground">
-          AI-generated answers. Always verify on the official{" "}
-          <a
-            href="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/home"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-foreground"
-          >
-            EU Funding &amp; Tenders Portal
-          </a>
-          .
-        </p>
       </div>
     </div>
   );
