@@ -411,7 +411,7 @@ function CallCard({ call: c, onBrief, onChat }: { call: Call; onBrief: () => voi
             ChatBot
           </button>
           <a
-            href={`/participate/consortium?call=${c.id}`}
+            href={`/participate/call-match?call=${c.id}`}
             className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-1 px-2 py-3 text-[11px] font-medium text-muted-foreground transition hover:border-brand hover:bg-brand/5 hover:text-brand"
           >
             <Users className="h-4 w-4" />
