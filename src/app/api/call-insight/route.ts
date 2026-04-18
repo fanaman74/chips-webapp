@@ -1,17 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
 const OPENROUTER = "https://openrouter.ai/api/v1/chat/completions";
+const WORK_PROGRAMME_PDF =
+  "https://www.chips-ju.europa.eu/GB_2025.125_Appendix8_2026_CEIv1.pdf";
+const STORAGE_BUCKET = "call-docs";
 
 export type CallInsight = {
+  context: string;
   scope: string;
-  objectives: string[];
-  whoShouldApply: string;
-  budgetInfo: string;
-  evaluationCriteria: string[];
-  keyRequirements: string[];
-  tips: string[];
+  expectedOutcomes: string[];
+  fitLevel: "High" | "Medium" | "Weak";
+  fitJustification: string;
+  evaluationExcellence: string;
+  evaluationImpact: string;
+  evaluationImplementation: string;
+  positioningAdvice: string[];
+  nextSteps: string[];
   disclaimer: string;
 };
+
+async function ensureBucket() {
+  const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+  if (!buckets?.find((b) => b.name === STORAGE_BUCKET)) {
+    await supabaseAdmin.storage.createBucket(STORAGE_BUCKET, { public: false });
+  }
+}
+
+async function getCachedText(callId: string): Promise<string | null> {
+  const { data, error } = await supabaseAdmin.storage
+    .from(STORAGE_BUCKET)
+    .download(`${callId}.txt`);
+  if (error || !data) return null;
+  return data.text();
+}
+
+async function fetchAndCacheText(callId: string, title: string): Promise<string> {
+  try {
+    const pdfRes = await fetch(WORK_PROGRAMME_PDF, {
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!pdfRes.ok) return "";
+
+    const buffer = Buffer.from(await pdfRes.arrayBuffer());
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: buffer });
+    const result = await parser.getText();
+    const fullText: string = result.text;
+
+    const searchTerms = [
+      callId,
+      callId.replace(/^HORIZON-JU-/, ""),
+      ...title.split(/\s+/).filter((w) => w.length > 5).slice(0, 3),
+    ];
+
+    let relevantText = "";
+    for (const term of searchTerms) {
+      const idx = fullText.indexOf(term);
+      if (idx !== -1) {
+        const start = Math.max(0, idx - 300);
+        const end = Math.min(fullText.length, idx + 6000);
+        relevantText = fullText.slice(start, end);
+        break;
+      }
+    }
+
+    if (!relevantText) relevantText = fullText.slice(0, 6000);
+
+    await ensureBucket();
+    await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .upload(`${callId}.txt`, new Blob([relevantText], { type: "text/plain" }), {
+        upsert: true,
+      });
+
+    return relevantText;
+  } catch {
+    return "";
+  }
+}
 
 export async function POST(req: NextRequest) {
   const key = process.env.OPENROUTER_API_KEY;
@@ -34,27 +101,46 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "callId is required." }, { status: 400 });
   }
 
-  const prompt = `You are an expert advisor on EU Chips Joint Undertaking funding programmes with deep knowledge of the CHIPS JU Strategic Research and Innovation Agenda (SRIA) and the 2026 Work Programme.
+  const topicText =
+    (await getCachedText(callId).catch(() => null)) ??
+    (await fetchAndCacheText(callId, title));
 
-A user wants detailed information about this funding call from the EU Funding & Tenders Portal:
+  const topicContext = topicText
+    ? `\n\nOFFICIAL CALL TEXT (from CHIPS JU 2026 Work Programme):\n"""\n${topicText}\n"""\n`
+    : "";
 
+  const prompt = `You are a senior Horizon Europe funding strategist and EU evaluator-level expert with deep knowledge of:
+- Horizon Europe structure (Pillars, Clusters, Destinations)
+- CHIPS JU / ECS R&I programme and its 2026 Work Programme
+- Proposal evaluation criteria (Excellence, Impact, Implementation)
+- EU policy priorities (Green Deal, Digital, Industrial Strategy)
+
+You operate as an EU Commission evaluator AND a top-tier strategy consultant. Your goal is NOT to summarise — your goal is to INTERPRET the call strategically and help applicants WIN funding.
+
+Analyse this specific CHIPS JU funding call:
 Call ID: ${callId}
 Title: ${title}
 Programme: ${programme}
-Instrument: ${instrument}${openDate ? `\nOpened: ${openDate}` : ""}${deadline ? `\nDeadline: ${deadline}` : ""}${summary ? `\nSummary: ${summary}` : ""}
+Instrument: ${instrument}${openDate ? `\nOpened: ${openDate}` : ""}${deadline ? `\nDeadline: ${deadline}` : ""}${summary ? `\nPortal summary: ${summary}` : ""}${topicContext}
 
-Provide a comprehensive, actionable briefing about this call based on your knowledge of the CHIPS JU 2026 Work Programme, the SRIA, and the EU Horizon Europe rules. Be specific and practical.
+Think like an evaluator. Analyse through:
+A. CONTEXT — Programme/cluster, policy objective (WHY the EU funds this)
+B. CALL BREAKDOWN — Scope, expected outcomes, impact requirements
+C. EVALUATION LOGIC — What evaluators look for under Excellence, Impact, Implementation
 
 Return ONLY a JSON object — no markdown, no explanation:
 {
-  "scope": "2-3 sentence description of what this call covers and its strategic context within the CHIPS JU programme",
-  "objectives": ["Specific objective 1", "Specific objective 2", "Specific objective 3", "Specific objective 4"],
-  "whoShouldApply": "1-2 sentences on ideal applicant profiles: organisation types, TRL levels, consortium composition",
-  "budgetInfo": "What we know about budget: typical project size, total call budget if known, co-funding rates",
-  "evaluationCriteria": ["Excellence criterion", "Impact criterion", "Implementation criterion"],
-  "keyRequirements": ["Minimum number of partners", "TRL range", "Any country or sector restrictions", "Co-funding requirements"],
-  "tips": ["Actionable tip 1 for writing a strong proposal", "Tip 2", "Tip 3"],
-  "disclaimer": "Short note that this is AI-generated from training data and applicants should verify details on the official EU Funding & Tenders Portal."
+  "context": "2-3 sentences: programme cluster, EU policy driver, WHY this call exists",
+  "scope": "What is in scope and explicitly out of scope — be specific",
+  "expectedOutcomes": ["Concrete deliverable or outcome expected 1", "Outcome 2", "Outcome 3", "Outcome 4"],
+  "fitLevel": "High",
+  "fitJustification": "1-2 sentences on what type of project/consortium has strong natural fit — TRL range, sector, actor type",
+  "evaluationExcellence": "What evaluators specifically look for under Excellence: innovation level, technical credibility, SoA beyond",
+  "evaluationImpact": "What evaluators look for under Impact: EU priority alignment, market/societal value, measurable KPIs",
+  "evaluationImplementation": "What evaluators look for under Implementation: consortium strength, feasibility, milestone credibility",
+  "positioningAdvice": ["Specific tip 1 to frame a winning proposal", "Tip 2 — common mistake to avoid", "Tip 3 — strategic angle"],
+  "nextSteps": ["First concrete action the applicant should take", "Second action", "Where to validate or find more info"],
+  "disclaimer": "One sentence: whether this analysis is based on the official Work Programme document or AI training knowledge, and that applicants should verify on the EU Funding & Tenders Portal."
 }`;
 
   try {

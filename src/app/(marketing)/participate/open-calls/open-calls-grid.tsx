@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  X, ExternalLink, Clock, Loader2, Target, Users, Euro,
-  CheckCircle2, AlertCircle, Lightbulb, ChevronRight,
+  X, ExternalLink, Clock, Loader2, Target, Users,
+  CheckCircle2, AlertCircle, Lightbulb, ChevronRight, BarChart3, ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, daysUntil, relativeDeadline } from "@/lib/format";
@@ -160,21 +160,38 @@ function PanelBadges({ call: c }: { call: Call }) {
   );
 }
 
+const FIT_COLOR = {
+  High: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+  Medium: "bg-amber/15 text-amber border-amber/30",
+  Weak: "bg-rose/15 text-rose border-rose/30",
+};
+
 function InsightPanel({ insight }: { insight: CallInsight }) {
+  const fitColor = FIT_COLOR[insight.fitLevel] ?? FIT_COLOR["Medium"];
+
   return (
     <div className="space-y-5">
-      {/* Scope */}
-      <Section icon={<Target className="h-4 w-4" />} title="Scope">
-        <p className="text-sm leading-relaxed text-muted-foreground">{insight.scope}</p>
-      </Section>
+      {/* Context */}
+      {insight.context && (
+        <Section icon={<Target className="h-4 w-4" />} title="Strategic Context">
+          <p className="text-sm leading-relaxed text-muted-foreground">{insight.context}</p>
+        </Section>
+      )}
 
-      {/* Objectives */}
-      {insight.objectives?.length > 0 && (
-        <Section icon={<CheckCircle2 className="h-4 w-4" />} title="Objectives">
+      {/* Scope */}
+      {insight.scope && (
+        <Section icon={<CheckCircle2 className="h-4 w-4" />} title="Scope">
+          <p className="text-sm leading-relaxed text-muted-foreground">{insight.scope}</p>
+        </Section>
+      )}
+
+      {/* Expected outcomes */}
+      {insight.expectedOutcomes?.length > 0 && (
+        <Section icon={<ChevronRight className="h-4 w-4" />} title="Expected Outcomes">
           <ul className="space-y-1.5">
-            {insight.objectives.map((o, i) => (
+            {insight.expectedOutcomes.map((o, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
+                <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
                 {o}
               </li>
             ))}
@@ -182,56 +199,74 @@ function InsightPanel({ insight }: { insight: CallInsight }) {
         </Section>
       )}
 
-      {/* Who should apply */}
-      {insight.whoShouldApply && (
-        <Section icon={<Users className="h-4 w-4" />} title="Who should apply">
-          <p className="text-sm leading-relaxed text-muted-foreground">{insight.whoShouldApply}</p>
+      {/* Fit level */}
+      {insight.fitLevel && (
+        <div className="rounded-xl border border-border bg-surface-1 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-foreground">
+              <BarChart3 className="h-4 w-4" />
+              <span className="font-display text-sm font-semibold tracking-tight">Fit Assessment</span>
+            </div>
+            <span className={cn("rounded-full border px-2.5 py-0.5 text-xs font-semibold", fitColor)}>
+              {insight.fitLevel} Fit
+            </span>
+          </div>
+          {insight.fitJustification && (
+            <p className="text-sm leading-relaxed text-muted-foreground">{insight.fitJustification}</p>
+          )}
+        </div>
+      )}
+
+      {/* Evaluation */}
+      {(insight.evaluationExcellence || insight.evaluationImpact || insight.evaluationImplementation) && (
+        <Section icon={<AlertCircle className="h-4 w-4" />} title="Evaluation Criteria">
+          <div className="space-y-3">
+            {insight.evaluationExcellence && (
+              <div>
+                <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand">Excellence</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{insight.evaluationExcellence}</p>
+              </div>
+            )}
+            {insight.evaluationImpact && (
+              <div>
+                <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber">Impact</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{insight.evaluationImpact}</p>
+              </div>
+            )}
+            {insight.evaluationImplementation && (
+              <div>
+                <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">Implementation</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{insight.evaluationImplementation}</p>
+              </div>
+            )}
+          </div>
         </Section>
       )}
 
-      {/* Budget */}
-      {insight.budgetInfo && (
-        <Section icon={<Euro className="h-4 w-4" />} title="Budget">
-          <p className="text-sm leading-relaxed text-muted-foreground">{insight.budgetInfo}</p>
-        </Section>
-      )}
-
-      {/* Evaluation criteria */}
-      {insight.evaluationCriteria?.length > 0 && (
-        <Section icon={<AlertCircle className="h-4 w-4" />} title="Evaluation criteria">
+      {/* Positioning */}
+      {insight.positioningAdvice?.length > 0 && (
+        <Section icon={<Lightbulb className="h-4 w-4 text-amber" />} title="Positioning Advice">
           <ul className="space-y-1.5">
-            {insight.evaluationCriteria.map((c, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
-                {c}
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {/* Key requirements */}
-      {insight.keyRequirements?.length > 0 && (
-        <Section icon={<CheckCircle2 className="h-4 w-4" />} title="Key requirements">
-          <ul className="space-y-1.5">
-            {insight.keyRequirements.map((r, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-600" />
-                {r}
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {/* Tips */}
-      {insight.tips?.length > 0 && (
-        <Section icon={<Lightbulb className="h-4 w-4 text-amber" />} title="Proposal tips">
-          <ul className="space-y-1.5">
-            {insight.tips.map((t, i) => (
+            {insight.positioningAdvice.map((t, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                 <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber" />
                 {t}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
+      {/* Next steps */}
+      {insight.nextSteps?.length > 0 && (
+        <Section icon={<Users className="h-4 w-4" />} title="Next Steps">
+          <ul className="space-y-1.5">
+            {insight.nextSteps.map((s, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">
+                  {i + 1}
+                </span>
+                {s}
               </li>
             ))}
           </ul>
@@ -259,9 +294,9 @@ function Section({
 }) {
   return (
     <div>
-      <div className="mb-2 flex items-center gap-2 text-foreground">
+      <div className="mb-3 flex items-center justify-center gap-2 border-b border-border pb-2 text-foreground">
         {icon}
-        <span className="font-display text-sm font-semibold tracking-tight">{title}</span>
+        <span className="font-display text-sm font-semibold uppercase tracking-widest">{title}</span>
       </div>
       {children}
     </div>
