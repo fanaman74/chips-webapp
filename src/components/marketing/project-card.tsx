@@ -56,21 +56,21 @@ export function ProjectCard({ project }: { project: Project }) {
 
       <div className="relative mt-6 grid grid-cols-3 gap-4 border-t border-border pt-4 text-xs">
         <div>
-          <div className="font-mono text-[10px] uppercase text-muted-foreground">Funding</div>
-          <div className="mt-0.5 font-display text-sm font-semibold">
-            {project.fundingEur ? formatEur(project.fundingEur, { compact: true }) : "—"}
-          </div>
-        </div>
-        <div>
-          <div className="font-mono text-[10px] uppercase text-muted-foreground">Partners</div>
-          <div className="mt-0.5 font-display text-sm font-semibold">
-            {project.consortiumSize || "—"}
-          </div>
-        </div>
-        <div>
-          <div className="font-mono text-[10px] uppercase text-muted-foreground">Lead</div>
+          <div className="font-mono text-[10px] uppercase text-muted-foreground">Country</div>
           <div className="mt-0.5 font-display text-sm font-semibold truncate">
             {project.coordinator.country || "—"}
+          </div>
+        </div>
+        <div>
+          <div className="font-mono text-[10px] uppercase text-muted-foreground">Start</div>
+          <div className="mt-0.5 font-display text-sm font-semibold">
+            {project.startDate ? project.startDate.slice(0, 4) : "—"}
+          </div>
+        </div>
+        <div>
+          <div className="font-mono text-[10px] uppercase text-muted-foreground">End</div>
+          <div className="mt-0.5 font-display text-sm font-semibold">
+            {project.endDate ? project.endDate.slice(0, 4) : "—"}
           </div>
         </div>
       </div>

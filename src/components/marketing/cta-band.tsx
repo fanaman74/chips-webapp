@@ -19,25 +19,25 @@ export function CtaBand() {
           <div className="relative grid gap-8 md:grid-cols-5 md:items-center">
             <div className="md:col-span-3">
               <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl text-balance">
-                Building Europe&rsquo;s chips? We want to work with you.
+                Stay ahead of the Chips JU ecosystem.
               </h2>
               <p className="mt-4 max-w-xl text-muted-foreground">
-                Whether you&rsquo;re an SME, research institution, university or
-                industrial consortium — the Chips JU has a pathway for you. Explore
-                open calls, browse pilot line access, or contact the programme
-                office directly.
+                This platform uses AI to surface the funding calls, projects and
+                policy updates that matter to your organisation — aggregated daily
+                from CORDIS and official Chips JU sources. Not the official Chips
+                JU website.
               </p>
             </div>
             <div className="md:col-span-2 md:justify-self-end">
               <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
                 <Button size="lg" asChild>
-                  <Link href="/calls">
-                    See open calls
+                  <Link href="/projects">
+                    Browse projects
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/participate">How to participate</Link>
+                  <Link href="/calls">View open calls</Link>
                 </Button>
               </div>
             </div>

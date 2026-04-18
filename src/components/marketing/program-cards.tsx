@@ -19,13 +19,13 @@ export function ProgramCards() {
     <Section>
       <Container>
         <div className="mb-10 text-center">
-          <Eyebrow className="justify-center">Our programmes</Eyebrow>
+          <Eyebrow className="justify-center">Chips JU programmes</Eyebrow>
           <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl text-balance">
-            Three pillars, one mission — European semiconductor sovereignty.
+            Three pillars. One mission. European sovereignty.
           </h2>
           <div className="section-green-line" />
           <p className="mt-4 mx-auto max-w-xl text-muted-foreground">
-            €12.3 billion across the Multiannual Work Programme 2023–2027.
+            €12.3 billion across the Multiannual Work Programme 2023–2027, tracked live from CORDIS.
           </p>
         </div>
 

@@ -6,7 +6,7 @@ export function LogoWall() {
     <section className="border-b border-border bg-surface-2/60 py-14">
       <Container>
         <Eyebrow className="justify-center flex">
-          <span>Trusted by Europe&rsquo;s leading semiconductor ecosystem</span>
+          <span>Key players in Europe&rsquo;s semiconductor ecosystem</span>
         </Eyebrow>
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
           {INDUSTRY_MEMBERS.map((name) => (

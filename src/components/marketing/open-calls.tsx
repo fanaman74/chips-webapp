@@ -9,14 +9,14 @@ import { INSTRUMENT_COLOR, colorFor } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 
 export function OpenCallsSection() {
-  const calls = openCalls().slice(0, 3);
+  const calls = openCalls();
   return (
     <Section>
       <Container>
         <div className="mb-10 text-center">
           <Eyebrow className="justify-center">Open calls</Eyebrow>
           <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl text-balance">
-            Apply for funding — €260M across three calls.
+            Apply for funding — {calls.length} open calls now live.
           </h2>
           <div className="section-green-line" />
           <div className="mt-4 flex justify-center">
@@ -29,7 +29,7 @@ export function OpenCallsSection() {
           </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {calls.map((c) => {
             const instrColor = colorFor(INSTRUMENT_COLOR[c.instrument] ?? "brand");
             return (

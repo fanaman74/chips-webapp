@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 
 export async function FeaturedProjects() {
   const allProjects = await getCordisProjects();
-  const projects = allProjects.slice(0, 4);
+  const chips = allProjects.filter((p) => p.programme === "CHIPS");
+  const kdt = allProjects.filter((p) => p.programme === "KDT");
+  const projects = [...chips, ...kdt].slice(0, 4);
   return (
     <Section className="bg-surface-2/60 border-t border-b border-border">
       <Container>
