@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   X, ExternalLink, Clock, Loader2, Target, Users,
-  CheckCircle2, AlertCircle, Lightbulb, ChevronRight, BarChart3, ArrowRight,
+  CheckCircle2, AlertCircle, Lightbulb, ChevronRight, BarChart3, ArrowRight, Download, Info,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, daysUntil, relativeDeadline } from "@/lib/format";
@@ -102,7 +102,7 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
                   <div>
                     <div className="font-mono text-[10px] uppercase text-muted-foreground">Deadline</div>
                     <div className="mt-0.5 font-display font-semibold">{formatDate(selected.deadline)}</div>
-                    <div className="text-[11px] text-amber">{relativeDeadline(selected.deadline)}</div>
+                    {daysUntil(selected.deadline) >= 0 && <div className="text-[11px] text-amber">{relativeDeadline(selected.deadline)}</div>}
                   </div>
                 ) : (
                   <div>
@@ -130,15 +130,38 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
             </div>
 
             {/* Footer CTA */}
-            <div className="border-t border-border p-4">
+            <div className="border-t border-border p-4 flex items-center gap-2">
+              {/* Download Work Programme PDF */}
+              <a
+                href="https://www.chips-ju.europa.eu/GB_2025.125_Appendix8_2026_CEIv1.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Download Work Programme PDF"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-1 text-muted-foreground transition hover:border-brand hover:text-brand"
+              >
+                <Download className="h-4 w-4" />
+              </a>
+
+              {/* More info on CHIPS JU */}
+              <a
+                href={`https://www.chips-ju.europa.eu/calls/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-surface-1 text-sm font-medium text-muted-foreground transition hover:border-brand hover:text-brand"
+              >
+                <Info className="h-4 w-4" />
+                More info
+              </a>
+
+              {/* Apply */}
               <a
                 href={selected.portal_url ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-medium text-white transition hover:bg-brand/90"
+                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand text-sm font-medium text-white transition hover:bg-brand/90"
               >
-                Apply on EU Funding & Tenders Portal
-                <ExternalLink className="h-4 w-4" />
+                Apply
+                <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
@@ -357,7 +380,7 @@ function CallCard({ call: c, onClick }: { call: Call; onClick: () => void }) {
             <div>
               <div className="font-mono text-[10px] uppercase text-muted-foreground">Deadline</div>
               <div className="mt-0.5 font-display text-sm font-semibold">{formatDate(c.deadline)}</div>
-              {urgency === "normal" && <div className={cn("text-[10px]", instrColor.text)}>{relativeDeadline(c.deadline)}</div>}
+              {urgency === "normal" && days !== null && days >= 0 && <div className={cn("text-[10px]", instrColor.text)}>{relativeDeadline(c.deadline)}</div>}
             </div>
           ) : <div />}
         </div>
