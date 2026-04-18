@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   X, ExternalLink, Clock, Loader2, Target, Users,
   CheckCircle2, AlertCircle, Lightbulb, ChevronRight, BarChart3, ArrowRight, Download, BotMessageSquare,
+  Zap,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, daysUntil, relativeDeadline } from "@/lib/format";
@@ -63,7 +64,14 @@ export function OpenCallsGrid({ calls }: { calls: Call[] }) {
 
       {/* Card grid */}
       <div className="grid gap-5 md:grid-cols-2">
-        {calls.map((c) => <CallCard key={c.id} call={c} onClick={() => openCall(c)} />)}
+        {calls.map((c) => (
+          <CallCard
+            key={c.id}
+            call={c}
+            onBrief={() => openCall(c)}
+            onChat={() => setChatCall(c)}
+          />
+        ))}
       </div>
 
       {/* Slide-over overlay */}
@@ -336,16 +344,13 @@ function Section({
   );
 }
 
-function CallCard({ call: c, onClick }: { call: Call; onClick: () => void }) {
+function CallCard({ call: c, onBrief, onChat }: { call: Call; onBrief: () => void; onChat: () => void }) {
   const instrColor = colorFor(INSTRUMENT_COLOR[c.instrument as keyof typeof INSTRUMENT_COLOR] ?? "brand");
   const days = c.deadline ? daysUntil(c.deadline) : null;
   const urgency = days !== null && days >= 0 && days <= 14 ? "urgent" : days !== null && days >= 0 && days <= 30 ? "soon" : "normal";
 
   return (
-    <button
-      onClick={onClick}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card text-left transition-all hover:-translate-y-0.5 hover:shadow-elevated hover:border-brand/40 w-full"
-    >
+    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card text-left transition-all hover:shadow-elevated hover:border-brand/40 w-full">
       <span aria-hidden className={cn("absolute inset-x-0 top-0 h-1", instrColor.dot)} />
       <div aria-hidden className={cn("pointer-events-none absolute -top-20 -right-20 h-52 w-52 rounded-full bg-gradient-to-br opacity-30 blur-3xl", instrColor.gradient)} />
 
@@ -365,7 +370,7 @@ function CallCard({ call: c, onClick }: { call: Call; onClick: () => void }) {
 
         <span className={cn("font-mono text-xs font-semibold", instrColor.text)}>{c.id}</span>
 
-        <h3 className="font-display text-lg font-semibold leading-snug tracking-tight group-hover:text-brand transition-colors">
+        <h3 className="font-display text-lg font-semibold leading-snug tracking-tight">
           {c.title}
         </h3>
 
@@ -389,11 +394,31 @@ function CallCard({ call: c, onClick }: { call: Call; onClick: () => void }) {
           ) : <div />}
         </div>
 
-        <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground group-hover:text-brand transition-colors">
-          <span>Click to view call briefing</span>
-          <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        {/* Action buttons */}
+        <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
+          <button
+            onClick={onBrief}
+            className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-1 px-2 py-3 text-[11px] font-medium text-muted-foreground transition hover:border-brand hover:bg-brand/5 hover:text-brand"
+          >
+            <Zap className="h-4 w-4" />
+            Quick Brief
+          </button>
+          <button
+            onClick={onChat}
+            className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-1 px-2 py-3 text-[11px] font-medium text-muted-foreground transition hover:border-brand hover:bg-brand/5 hover:text-brand"
+          >
+            <BotMessageSquare className="h-4 w-4" />
+            ChatBot
+          </button>
+          <a
+            href={`/participate/consortium?call=${c.id}`}
+            className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface-1 px-2 py-3 text-[11px] font-medium text-muted-foreground transition hover:border-brand hover:bg-brand/5 hover:text-brand"
+          >
+            <Users className="h-4 w-4" />
+            Call Match
+          </a>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
