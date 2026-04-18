@@ -126,7 +126,7 @@ Return ONLY a JSON array — no markdown, no explanation:
       "X-Title": "Chips JU Consortium Builder",
     },
     body: JSON.stringify({
-      model: "anthropic/claude-3.5-haiku",
+      model: "google/gemma-4-26b-a4b-it:free",
       max_tokens: 3000,
       messages: [{ role: "user", content: prompt }],
     }),

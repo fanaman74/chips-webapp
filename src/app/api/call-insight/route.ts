@@ -67,7 +67,7 @@ Return ONLY a JSON object — no markdown, no explanation:
         "X-Title": "Chips JU Call Insight",
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3.5-haiku",
+        model: "google/gemma-4-26b-a4b-it:free",
         max_tokens: 2000,
         messages: [{ role: "user", content: prompt }],
       }),
